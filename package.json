@@ -1,0 +1,27 @@
+{
+  "name": "unicode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unicode coding platform",
+  "scripts": {
+    "backend": "npm run start:dev --workspace=backend",
+    "frontend": "npm run dev --workspace=frontend",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "unicode",
+    "coding-platform",
+    "nestjs",
+    "react"
+  ],
+  "author": "aakamshpm",
+  "license": "MIT"
+}

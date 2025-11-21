@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Build Outputs
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# Backend (NestJS)
+backend/dist/
+backend/build/
+backend/.env
+
+# Frontend (React/Vite)
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.cache/
+
+# Testing
+coverage/
+*.coverage
+.nyc_output/
+.jest/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.directory
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+.history/
+
+# Docker
+docker-compose.override.yml
+*.log
+volumes/
+.dockerignore
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# Editor Backups
+*~
+*.bak
+*.orig
+
+# TypeScript
+*.tsbuildinfo
+
+# Redis dump
+dump.rdb
+
+# Misc
+.cache/
+.parcel-cache/
+.eslintcache
