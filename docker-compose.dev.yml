@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres_dev_password_123
+
+  redis:
+    ports:
+      - '6380:6379'
+    environment:
+      REDIS_PASSWORD: redis_dev_password_123
+    command: redis-server --requirepass redis_dev_password_123
+
+  rabbitmq:
+    ports:
+      - '5673:5672' # AMQP port
+      - '15673:15672' # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: rabbitmq_dev_password_123
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+      target: development
+    ports:
+      - '4000:4000'
+      - '9229:9229' # Debug port
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres_dev_password_123
+      DATABASE_NAME: unicode_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis_dev_password_123
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: rabbitmq_dev_password_123
+    command: npm run start:dev
