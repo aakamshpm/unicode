@@ -4,10 +4,12 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
     ConfigModule,
+    HealthModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
