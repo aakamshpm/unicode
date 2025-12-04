@@ -7,11 +7,13 @@ export interface RedisConfig {
   ttl: number;
 }
 
-export default registerAs('redis', (): RedisConfig => {
+export const REDIS_CONFIG_KEY = 'redis';
+
+export default registerAs(REDIS_CONFIG_KEY, (): RedisConfig => {
   const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_TTL } = process.env;
 
   if (!REDIS_HOST) throw new Error('REDIS_HOST is not set');
-  if (!REDIS_PASSWORD) throw new Error('DATABASE_PORT is not set');
+  if (!REDIS_PASSWORD) throw new Error('REDIS_PASSWORD is not set');
 
   const port = Number(REDIS_PORT);
   if (Number.isNaN(port)) throw new Error('REDIS_PORT must be a number');

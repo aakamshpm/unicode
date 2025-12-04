@@ -4,9 +4,13 @@
   "private": true,
   "description": "Unicode coding platform",
   "scripts": {
+    "docker:up": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres redis rabbitmq",
+    "docker:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
     "backend": "npm run start:dev --workspace=backend",
     "frontend": "npm run dev --workspace=frontend",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "dev:full": "npm run docker:up && concurrently \"npm run backend\" \"npm run frontend\"",
     "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
   },
   "workspaces": [

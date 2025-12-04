@@ -9,7 +9,9 @@ export interface RabbitMQConfig {
   url: string;
 }
 
-export default registerAs('rabbitmq', (): RabbitMQConfig => {
+export const RABBITMQ_CONFIG_KEY = 'rabbitmq';
+
+export default registerAs(RABBITMQ_CONFIG_KEY, (): RabbitMQConfig => {
   const {
     RABBITMQ_HOST,
     RABBITMQ_PORT,
