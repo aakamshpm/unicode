@@ -16,7 +16,7 @@ export const envValidationSchema = Joi.object({
   DATABASE_SYNCHRONIZE: Joi.boolean().default(false),
   DATABASE_LOGGING: Joi.boolean().default(false),
 
-   // Redis
+  // Redis
   REDIS_HOST: Joi.string().required(),
   REDIS_PORT: Joi.number().default(6379),
   REDIS_PASSWORD: Joi.string().required(),
@@ -32,4 +32,12 @@ export const envValidationSchema = Joi.object({
   // JWT
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRATION: Joi.string().default('7d'),
+
+  // Github OAuth
+  GITHUB_CLIENT_ID: Joi.string().required(),
+  GITHUB_CLIENT_SECRET: Joi.string().required(),
+  GITHUB_CALLBACK_URL: Joi.string().uri().required(),
+
+  // Frontend
+  FRONTEND_URL: Joi.string().uri().required(),
 });

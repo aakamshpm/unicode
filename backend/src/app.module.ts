@@ -5,6 +5,7 @@ import { ConfigModule } from './config/config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { HealthModule } from './health/health.module';
       useFactory: (configService: ConfigService) =>
         configService.get('database')!,
     }),
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
