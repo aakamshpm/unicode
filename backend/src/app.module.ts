@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { RedisModule } from './redis/redis.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RedisModule } from './redis/redis.module';
         configService.get('database')!,
     }),
     RedisModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
