@@ -6,6 +6,19 @@ import { REDIS_CLIENT } from './redis.module';
 export class RedisService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
+  async setSession(
+    userId: string,
+    sessionId: string,
+    ttl: number = 7 * 24 * 60 * 60,
+  ): Promise<void> {
+    const key = `session:${sessionId}`;
+    const userSessionsKey = `user_sessions:${userId}`;
+
+    await this.redis.set(key, userId, 'EX', ttl);
+    await this.redis.sadd(userSessionsKey, sessionId);
+    await this.redis.expire(userSessionsKey, ttl);
+  }
+
   async getSession(sessionId: string): Promise<string | null> {
     return this.redis.get(`session:${sessionId}`);
   }
@@ -28,5 +41,28 @@ export class RedisService {
       await this.redis.del(...sessionKeys);
       await this.redis.del(sessionsKey); // delete the main set
     }
+  }
+
+  async setOAuthProfile(
+    tempToken: string,
+    profile: { email: string; displayName: string; avatarUrl: string },
+  ): Promise<void> {
+    await this.redis.set(
+      `oauth:${tempToken}`,
+      JSON.stringify(profile),
+      'EX',
+      300,
+    );
+  }
+
+  async getOAuthProfile(
+    tempToken: string,
+  ): Promise<{ email: string; displayName: string; avatarUrl: string } | null> {
+    const data = await this.redis.get(`oauth:${tempToken}`);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async deleteOAuthProfile(tempToken: string): Promise<void> {
+    await this.redis.del(`oauth:${tempToken}`);
   }
 }
