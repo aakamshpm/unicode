@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { REDIS_CLIENT } from './redis.module';
+import { REDIS_CLIENT } from './redis.constants';
+import { IOAuthProfile } from '../modules/auth/interfaces/oauth-profile.interface';
 
 @Injectable()
 export class RedisService {
@@ -45,24 +46,42 @@ export class RedisService {
 
   async setOAuthProfile(
     tempToken: string,
-    profile: { email: string; displayName: string; avatarUrl: string },
+    profile: IOAuthProfile,
   ): Promise<void> {
+    const ttl = 300; // 5minutes
+
     await this.redis.set(
       `oauth:${tempToken}`,
       JSON.stringify(profile),
       'EX',
-      300,
+      ttl,
     );
+
+    await this.redis.set(`oauth_email:${profile.email}`, tempToken, 'EX', ttl);
   }
 
-  async getOAuthProfile(
-    tempToken: string,
-  ): Promise<{ email: string; displayName: string; avatarUrl: string } | null> {
+  async getOAuthProfile(tempToken: string): Promise<IOAuthProfile | null> {
     const data = await this.redis.get(`oauth:${tempToken}`);
     return data ? JSON.parse(data) : null;
   }
 
+  async getOAuthProfileByEmail(
+    email: string,
+  ): Promise<{ tempToken: string; profile: IOAuthProfile } | null> {
+    const tempToken = await this.redis.get(`oauth_email:${email}`);
+    if (!tempToken) return null;
+
+    const profile = await this.getOAuthProfile(tempToken);
+    if (!profile) return null;
+
+    return { tempToken, profile };
+  }
+
   async deleteOAuthProfile(tempToken: string): Promise<void> {
+    const profile = await this.getOAuthProfile(tempToken);
+    if (profile) {
+      await this.redis.del(`oauth_email:${profile.email}`);
+    }
     await this.redis.del(`oauth:${tempToken}`);
   }
 }
