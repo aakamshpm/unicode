@@ -1,10 +1,9 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
-import { REDIS_CONFIG_KEY } from 'src/config/redis.config';
+import { REDIS_CONFIG_KEY } from '../config/redis.config';
 import { RedisService } from './redis.service';
-
-export const REDIS_CLIENT = 'REDIS_CLIENT';
+import { REDIS_CLIENT } from './redis.constants';
 
 @Global()
 @Module({
@@ -13,6 +12,11 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       provide: REDIS_CLIENT,
       useFactory: (configService: ConfigService) => {
         const redisConfig = configService.get(REDIS_CONFIG_KEY);
+        if (!redisConfig) {
+          throw new Error(
+            `Redis configuration not found. Make sure REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, and REDIS_TTL are set`,
+          );
+        }
         return new Redis({
           host: redisConfig.host,
           port: redisConfig.port,
