@@ -20,7 +20,7 @@ export class AuthService {
   ) {}
 
   async handleGithubCallback(profile: IOAuthProfile): Promise<{
-    needsUsername: boolean;
+    redirectToProfileCompletion: boolean;
     tempToken?: string;
     accessToken?: string;
   }> {
@@ -34,7 +34,7 @@ export class AuthService {
     if (existingUser) {
       await this.usersService.updateLastLogin(existingUser.id);
       const accessToken = await this.createSession(existingUser.id);
-      return { needsUsername: false, accessToken };
+      return { redirectToProfileCompletion: false, accessToken };
     }
 
     // New user: we need to check if they have a pending registration
@@ -64,7 +64,7 @@ export class AuthService {
     this.logger.debug(
       `New registration flow started for: ${profile.email}, tempToken: ${tempToken.substring(0, 8)}...`,
     );
-    return { needsUsername: true, tempToken };
+    return { redirectToProfileCompletion: true, tempToken };
   }
 
   async completeRegistration(
