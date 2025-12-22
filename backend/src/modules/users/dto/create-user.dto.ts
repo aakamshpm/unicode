@@ -21,11 +21,11 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  display_name?: string;
+  display_name: string | null;
 
   @IsString()
   @IsOptional()
-  avatar_url?: string;
+  avatar_url: string | null;
 
   @IsString()
   oauth_provider: string;

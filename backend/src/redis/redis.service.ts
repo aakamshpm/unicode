@@ -28,7 +28,7 @@ export class RedisService {
     const userId = await this.getSession(sessionId);
 
     if (userId) {
-      await this.redis.del(`sessionId:${sessionId}`);
+      await this.redis.del(`session:${sessionId}`);
       await this.redis.srem(`user_sessions:${userId}`, sessionId);
     }
   }

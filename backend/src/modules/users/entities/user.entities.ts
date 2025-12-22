@@ -18,13 +18,13 @@ export class User {
   username: string;
 
   @Column({ nullable: true })
-  display_name: string;
+  display_name: string | null;
 
   @Column({ default: 'github' })
   oauth_provider: string;
 
   @Column({ nullable: true })
-  avatar_url: string;
+  avatar_url: string | null;
 
   @Column({ type: 'int', default: 0 })
   easy_solved: number;
