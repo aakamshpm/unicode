@@ -17,13 +17,13 @@ export class User {
   @Column({ unique: true })
   username: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   display_name: string | null;
 
   @Column({ default: 'github' })
   oauth_provider: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   avatar_url: string | null;
 
   @Column({ type: 'int', default: 0 })
