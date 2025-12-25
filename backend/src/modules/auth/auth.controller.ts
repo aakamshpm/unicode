@@ -40,7 +40,7 @@ export class AuthController {
     const result = await this.authService.handleGithubCallback(user);
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
-    if (result.redirectToProfileCompletion)
+    if (result.isNewUser)
       return res.redirect(
         `${frontendUrl}/auth/complete?tempToken=${result.tempToken}`,
       );

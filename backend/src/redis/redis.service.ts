@@ -2,22 +2,31 @@ import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { REDIS_CLIENT } from './redis.constants';
 import { IOAuthProfile } from '../modules/auth/interfaces/oauth-profile.interface';
+import {
+  ACCESS_TOKEN_TTL,
+  REFRESH_TOKEN_TTL,
+  TEMP_TOKEN_TTL,
+} from 'src/modules/auth/auth.constants';
 
 @Injectable()
 export class RedisService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
+  // Access Token Session (valid for 15min)
+
   async setSession(
     userId: string,
     sessionId: string,
-    ttl: number = 7 * 24 * 60 * 60,
+    ttl: number = ACCESS_TOKEN_TTL,
   ): Promise<void> {
     const key = `session:${sessionId}`;
     const userSessionsKey = `user_sessions:${userId}`;
 
     await this.redis.set(key, userId, 'EX', ttl);
     await this.redis.sadd(userSessionsKey, sessionId);
-    await this.redis.expire(userSessionsKey, ttl);
+    // Set the user_sessions set to expire after refresh token TTL
+    // This ensures cleanup even if individual sessions expire
+    await this.redis.expire(userSessionsKey, REFRESH_TOKEN_TTL);
   }
 
   async getSession(sessionId: string): Promise<string | null> {
@@ -44,20 +53,66 @@ export class RedisService {
     }
   }
 
+  // Refresh Token Sessions (7days validity)
+  async setRefreshSession(
+    userId: string,
+    refreshId: string,
+    ttl: number = REFRESH_TOKEN_TTL,
+  ): Promise<void> {
+    const key = `refresh${refreshId}`;
+    const userRefreshKey = `user_refresh_tokens:${userId}`;
+
+    await this.redis.set(key, userId, 'EX', ttl);
+
+    await this.redis.sadd(userRefreshKey, refreshId);
+    await this.redis.expire(userRefreshKey, ttl);
+  }
+
+  async getRefreshToken(refreshId: string): Promise<string | null> {
+    return this.redis.get(`refresh:${refreshId}`); // returns userId
+  }
+
+  async getRefreshTokenTTL(refreshId: string): Promise<number> {
+    return this.redis.ttl(`refresh:${refreshId}`);
+  }
+
+  async deleteRefreshToken(refreshId: string): Promise<void> {
+    const userId = await this.getRefreshToken(refreshId);
+
+    if (userId) {
+      await this.redis.del(`refresh:${refreshId}`);
+      await this.redis.srem(`user_refresh_tokens:${userId}`, refreshId);
+    }
+  }
+
+  async deleteAllUserRefreshTokens(userId: string): Promise<void> {
+    const refreshKey = `user_refresh_tokens:${userId}`;
+    const refreshIds = await this.redis.smembers(refreshKey);
+
+    if (refreshIds.length > 0) {
+      const refreshKeys = refreshIds.map((id) => `refresh:${id}`);
+      await this.redis.del(...refreshKeys); // delete all refresh session for that user with key: refresh:userId
+      await this.redis.del(refreshKey); // delete the main user_refresh_tokens set for userId
+    }
+  }
+
   async setOAuthProfile(
     tempToken: string,
     profile: IOAuthProfile,
   ): Promise<void> {
-    const ttl = 300; // 5minutes
-
     await this.redis.set(
       `oauth:${tempToken}`,
       JSON.stringify(profile),
       'EX',
-      ttl,
+      TEMP_TOKEN_TTL,
     );
 
-    await this.redis.set(`oauth_email:${profile.email}`, tempToken, 'EX', ttl);
+    await this.redis.set(
+      `oauth_email:${profile.email}`,
+      tempToken,
+      'EX',
+      TEMP_TOKEN_TTL,
+    );
   }
 
   async getOAuthProfile(tempToken: string): Promise<IOAuthProfile | null> {

@@ -30,8 +30,10 @@ export const envValidationSchema = Joi.object({
   RABBITMQ_QUEUE_NAME: Joi.string().default('code_execution_queue'),
 
   // JWT
-  JWT_SECRET: Joi.string().min(32).required(),
-  JWT_EXPIRATION: Joi.string().default('7d'),
+  JWT_ACCESS_SECRET: Joi.string().min(32).required(),
+  JWT_ACCESS_EXPIRATION: Joi.string().default('15m'),
+  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
+  JWT_REFRESH_EXPIRATION: Joi.string().default('7d'),
 
   // Github OAuth
   GITHUB_CLIENT_ID: Joi.string().required(),

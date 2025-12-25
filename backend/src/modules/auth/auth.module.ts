@@ -17,9 +17,9 @@ import { StringValue } from 'ms';
       useFactory: (configService: ConfigService) => {
         const jwtConfig = configService.get<JwtConfig>('jwt')!;
         return {
-          secret: jwtConfig.secret,
+          secret: jwtConfig.accessToken.secret,
           signOptions: {
-            expiresIn: jwtConfig.expiresIn as StringValue,
+            expiresIn: jwtConfig.accessToken.expiresIn as StringValue,
           },
         };
       },
