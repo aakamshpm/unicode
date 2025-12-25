@@ -13,6 +13,7 @@ import { IOAuthProfile } from './interfaces/oauth-profile.interface';
 import { JwtConfig } from 'src/config/jwt.config';
 import { StringValue } from 'ms';
 import { GRACE_PERIOD_TTL } from './auth.constants';
+import { ConfigService } from '@nestjs/config';
 
 export interface ITokenPair {
   accessToken: string;
@@ -35,12 +36,15 @@ export interface IGithubCallbackResult {
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly jwtConfig: JwtConfig;
   constructor(
     private readonly usersService: UsersService,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
-    private readonly jwtConfig: JwtConfig,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.jwtConfig = this.configService.get<JwtConfig>('jwt')!;
+  }
 
   async handleGithubCallback(
     profile: IOAuthProfile,
@@ -53,6 +57,7 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(profile.email);
 
     if (existingUser) {
+      // Existing user: just login and update timestamp
       await this.usersService.updateLastLogin(existingUser.id);
       const tokens = await this.createSession(existingUser.id);
       return { isNewUser: false, tokens };
@@ -79,7 +84,7 @@ export class AuthService {
     await this.redisService.setOAuthProfile(tempToken, {
       email: profile.email,
       displayName: profile.displayName,
-      avatarUrl: profile.avatarUrl || '',
+      avatarUrl: profile.avatarUrl || null,
     });
 
     this.logger.debug(
@@ -145,7 +150,7 @@ export class AuthService {
     // Renew both tokens to keep user logged in
     if (ttl > 0 && ttl <= GRACE_PERIOD_TTL) {
       this.logger.debug(
-        `Refresh token in grace peroid (TTL: ${ttl}s), renewing both tokens for user: ${userId}`,
+        `Refresh token in grace period (TTL: ${ttl}s), renewing both tokens for user: ${userId}`,
       );
 
       // Delete old refresh token
@@ -186,6 +191,16 @@ export class AuthService {
   async logoutAll(userId: string): Promise<void> {
     await this.redisService.deleteAllUserSessions(userId);
     await this.redisService.deleteAllUserRefreshTokens(userId);
+  }
+
+  validateRefreshToken(token: string): { sub: string; refreshId: string } {
+    try {
+      return this.jwtService.verify(token, {
+        secret: this.jwtConfig.refreshToken.secret,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
   private async signAccessToken(

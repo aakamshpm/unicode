@@ -4,6 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from 'src/redis/redis.service';
 import { JwtConfig } from '../../../config/jwt.config';
+import { Request } from 'express';
+import { ACCESS_TOKEN_COOKIE } from '../auth.constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -14,9 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const jwtConfig = configService.get<JwtConfig>('jwt')!;
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req?.cookies?.[ACCESS_TOKEN_COOKIE] || null,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
-      secretOrKey: jwtConfig.secret,
+      secretOrKey: jwtConfig.accessToken.secret,
     });
   }
 

@@ -59,7 +59,7 @@ export class RedisService {
     refreshId: string,
     ttl: number = REFRESH_TOKEN_TTL,
   ): Promise<void> {
-    const key = `refresh${refreshId}`;
+    const key = `refresh:${refreshId}`;
     const userRefreshKey = `user_refresh_tokens:${userId}`;
 
     await this.redis.set(key, userId, 'EX', ttl);
