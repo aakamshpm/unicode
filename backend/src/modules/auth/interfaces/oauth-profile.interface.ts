@@ -1,5 +1,5 @@
 export interface IOAuthProfile {
-  email: string;
-  displayName: string;
-  avatarUrl: string;
+  email: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
 }
