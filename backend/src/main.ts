@@ -11,6 +11,12 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  // Global API prefix - all routes will be prefixed with /api
+  // Exception: /health endpoint
+  app.setGlobalPrefix('api', {
+    exclude: ['health'],
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

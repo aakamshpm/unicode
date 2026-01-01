@@ -1,0 +1,7 @@
+ssl/*.key
+ssl/*.crt
+ssl/*.pem
+
+# Logs
+logs/
+*.log

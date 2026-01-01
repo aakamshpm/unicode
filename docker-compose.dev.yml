@@ -1,21 +1,21 @@
 services:
   postgres:
     ports:
-      - '5433:5432'
+      - "5433:5432"
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres_dev_password_123
+      POSTGRES_DB: unicode_db
 
   redis:
     ports:
-      - '6380:6379'
-    environment:
-      REDIS_PASSWORD: redis_dev_password_123
+      - "6380:6379"
     command: redis-server --requirepass redis_dev_password_123
 
   rabbitmq:
     ports:
-      - '5673:5672' # AMQP port
-      - '15673:15672' # Management UI
+      - "5673:5672"
+      - "15673:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: rabbitmq_dev_password_123
@@ -26,8 +26,8 @@ services:
       dockerfile: Dockerfile.dev
       target: development
     ports:
-      - '4000:4000'
-      - '9229:9229' # Debug port
+      - "4000:4000"
+      - "9229:9229"
     volumes:
       - ./backend/src:/app/src
       - ./backend/package.json:/app/package.json
@@ -40,11 +40,42 @@ services:
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres_dev_password_123
       DATABASE_NAME: unicode_db
+      DATABASE_SYNCHRONIZE: "true"
+      DATABASE_LOGGING: "true"
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: redis_dev_password_123
+      REDIS_TTL: 3600
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
       RABBITMQ_USER: admin
       RABBITMQ_PASSWORD: rabbitmq_dev_password_123
+      RABBITMQ_QUEUE_NAME: code_execution_queue
+      JWT_ACCESS_SECRET: dev_access_secret_32_chars_minimum
+      JWT_ACCESS_EXPIRATION: 1d
+      JWT_REFRESH_SECRET: dev_refresh_secret_32_chars_minimum
+      JWT_REFRESH_EXPIRATION: 7d
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_CALLBACK_URL: http://localhost:4000/auth/github/callback
+      FRONTEND_URL: http://localhost:5173
     command: npm run start:dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      target: development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/package.json:/app/package.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:4000
+    command: npm run dev

@@ -28,7 +28,7 @@ export class User {
    * SECURITY: select: false prevents password from being queried by default
    * Must explicitly select this field when needed for validation
    */
-  @Column({ nullable: true, select: false })
+  @Column({ type: 'varchar', nullable: true, select: false })
   password_hash: string | null;
 
   @Column({ type: 'enum', enum: ['github', 'email'], default: 'github' })

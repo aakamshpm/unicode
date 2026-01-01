@@ -6,6 +6,9 @@
   "scripts": {
     "docker:up": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres redis rabbitmq",
     "docker:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose -f docker-compose.yml up -d --build",
+    "docker:prod:down": "docker-compose -f docker-compose.yml down",
+    "docker:prod:logs": "docker-compose -f docker-compose.yml logs -f",
     "docker:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
     "backend": "npm run start:dev --workspace=backend",
     "frontend": "npm run dev --workspace=frontend",
