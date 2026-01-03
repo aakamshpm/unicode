@@ -54,7 +54,7 @@ async function seedRoles() {
       );
       console.log('Created "user" role:', userRole.id);
     } else {
-      console.log('⏭"user" role already exists');
+      console.log('"user" role already exists');
     }
 
     // Create 'admin' role
