@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "seed:roles": "ts-node -r tsconfig-paths/register src/scripts/seed-roles.ts"
+    "seed:roles": "ts-node -r tsconfig-paths/register src/scripts/seed-roles.ts",
+    "create:admin": "ts-node -r tsconfig-paths/register src/scripts/create-admin.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -28,6 +29,7 @@
     "@nestjs/microservices": "^11.1.9",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.4",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.0",

@@ -69,11 +69,13 @@ async function seedRoles() {
     }
 
     console.log('\nRole seeding completed successfully!\n');
+    process.exit(0);
   } catch (error) {
     console.error('\nError seeding roles:', error.message);
     process.exit(1);
   } finally {
     await app.close();
+    process.exit(0);
   }
 }
 

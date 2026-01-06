@@ -10,6 +10,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
+import { ProblemsModule } from './modules/problems/problems.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { APP_GUARD } from '@nestjs/core';
     RedisModule,
     UsersModule,
     AuthModule,
+    ProblemsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

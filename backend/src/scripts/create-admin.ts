@@ -221,6 +221,7 @@ async function createAdmin() {
     console.log('Role:', admin.role.name);
     console.log('User ID:', admin.id);
     console.log('\nKeep these credentials secure!\n');
+    process.exit(0);
   } catch (error) {
     console.error('\nError creating admin:', error.message);
     process.exit(1);
