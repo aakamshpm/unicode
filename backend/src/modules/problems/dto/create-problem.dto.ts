@@ -51,11 +51,25 @@ export class StarterCodeDto {
  * DTO for test cases (both sample and hidden)
  */
 export class TestCaseDto {
+  /**
+   * Test case input - can be any valid JSON structure
+   * Type: unknown - MUST validate/cast before use in execution engine
+   * Examples: {nums: [2,7], target: 9} | {s: "()"} | {height: [0,1,0]}
+   */
   @IsNotEmpty()
-  input: Record<string, any>;
+  input: unknown;
 
+  /**
+   * Expected output for this test case - can be primitive, array, or object
+   * Type: unknown - MUST validate/cast before comparing with actual output
+   * Examples: [0,1] (array) | true (boolean) | 6 (number) | [[1,6],[8,10]] (2D array)
+   * 
+   
+   * if (typeof expected_output === 'boolean') { ... }
+   * else if (Array.isArray(expected_output)) { ... }
+   */
   @IsNotEmpty()
-  expected_output: Record<string, any>;
+  expected_output: unknown;
 
   @IsOptional()
   is_sample?: boolean;

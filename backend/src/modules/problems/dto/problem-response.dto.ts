@@ -6,10 +6,21 @@ import {
 
 /**
  * Sample test case (only shown to users)
+ * Type: unknown - frontend should display as-is (JSON.stringify for objects/arrays)
  */
 export class SampleTestCaseDto {
-  input: Record<string, any>;
-  expected_output: Record<string, any>;
+  /**
+   * Test input - can be object, array, or primitive
+   * Frontend: Display using JSON.stringify() for proper formatting
+   */
+  input: unknown;
+
+  /**
+   * Expected output - can be any valid JSON value
+   * Frontend: Display using JSON.stringify() for proper formatting
+   */
+  expected_output: unknown;
+
   order: number;
 }
 
