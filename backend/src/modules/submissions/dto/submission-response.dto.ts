@@ -1,5 +1,8 @@
 import { Difficulty } from '../../problems/entities/problem.entity';
-import { SubmissionLanguage, SubmissionStatus } from '../enums/submission.enum';
+import {
+  SubmissionLanguage,
+  SubmissionStatus,
+} from '../enums/submission.enums';
 
 /**
  * Returns immediately after submission; a submission will be created in db

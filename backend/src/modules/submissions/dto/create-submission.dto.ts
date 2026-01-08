@@ -6,7 +6,7 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
-import { SubmissionLanguage } from '../enums/submission.enum';
+import { SubmissionLanguage } from '../enums/submission.enums';
 
 export class CreateSubmissionDto {
   @IsUUID()

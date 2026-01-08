@@ -9,7 +9,10 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entities';
 import { Problem } from '../../problems/entities/problem.entity';
-import { SubmissionLanguage, SubmissionStatus } from '../enums/submission.enum';
+import {
+  SubmissionLanguage,
+  SubmissionStatus,
+} from '../enums/submission.enums';
 
 @Entity('submissions')
 @Index(['user_id', 'problem_id'])
