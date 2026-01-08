@@ -101,11 +101,7 @@ export class ProblemsService {
 
     await this.testCaseRepository.save(testCaseEntities);
 
-    // Return problem with relations
-    return this.problemRepository.findOne({
-      where: { id: savedProblem.id },
-      relations: ['created_by', 'test_cases'],
-    })!;
+    return savedProblem;
   }
 
   /**

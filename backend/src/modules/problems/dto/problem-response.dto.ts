@@ -40,3 +40,10 @@ export class ProblemDetailResponseDto {
   created_at: Date;
   updated_at: Date;
 }
+
+export class ProblemMutationResponseDto {
+  id: string;
+  slug: string;
+  title: string;
+  message: string;
+}
