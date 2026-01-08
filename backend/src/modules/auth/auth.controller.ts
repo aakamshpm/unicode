@@ -80,7 +80,7 @@ export class AuthController {
   async completeRegistration(
     @Body() dto: CompleteRegistrationDto,
     @Req() req: Request,
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const tempToken = req.cookies?.[TEMP_TOKEN_COOKIE];
 
@@ -97,12 +97,15 @@ export class AuthController {
     this.clearTempTokenCookie(res);
     this.setAuthCookies(res, tokens);
 
-    return res.json({ success: true });
+    return { message: 'Registration completed successfully' };
   }
 
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Post('refresh')
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
 
     if (!refreshToken)
@@ -118,13 +121,16 @@ export class AuthController {
     if (result.renewed && result.refreshToken)
       this.setRefreshTokenCookie(res, result.refreshToken);
 
-    return res.json({ success: true, renewed: result.renewed });
+    return {
+      message: 'Token refreshed successfully',
+      renewed: result.renewed,
+    };
   }
 
   @Throttle({ default: { limit: 30, ttl: 60000 } }) // 30 request per minute
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as IAuthenticatedUser;
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
 
@@ -137,18 +143,21 @@ export class AuthController {
     await this.authService.logout(user.sessionId, refreshId);
     this.clearAuthCookies(res);
 
-    return res.json({ success: true, message: 'Logged out' });
+    return { message: 'Logged out successfully' };
   }
 
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @UseGuards(JwtAuthGuard)
   @Post('logout-all')
-  async logoutAll(@Req() req: Request, @Res() res: Response) {
+  async logoutAll(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user = req.user as IAuthenticatedUser;
     await this.authService.logoutAll(user.userId);
     this.clearAuthCookies(res);
 
-    return res.json({ success: true, message: 'All sessions terminated' });
+    return { message: 'All sessions terminated successfully' };
   }
 
   // Cookie Helpers //
