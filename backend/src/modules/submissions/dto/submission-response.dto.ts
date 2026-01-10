@@ -7,7 +7,7 @@ import {
 /**
  * Returns immediately after submission; a submission will be created in db
  * id will be returned to user, hence user dont need to wait until code execution is over
- * queue will store each submission request
+ * queue will store each submission request and worker will execute the code
  * user will make use of polling to check status
  */
 export class SubmissionCreatedResponseDto {
