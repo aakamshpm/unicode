@@ -169,6 +169,12 @@ export class ProblemsService {
     await this.problemRepository.save(problem);
   }
 
+  async findById(id: string): Promise<Problem | null> {
+    return this.problemRepository.findOne({
+      where: { id, is_active: true },
+    });
+  }
+
   /**
    * Get single problem by slug with ONLY sample test cases
    */

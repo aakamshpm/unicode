@@ -26,6 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   /**
+   * Automatically called by Passport
    * Validates the JWT session against Redis.
    * Returns userId and sessionId for use in route handlers.
    * User existence was already verified at login time.
@@ -37,6 +38,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('Session expired or invalid');
     }
 
-    return { userId, sessionId: payload.sessionId };
+    return { userId, sessionId: payload.sessionId }; // Passport assigns req.user with {userId, sessionId}
   }
 }
