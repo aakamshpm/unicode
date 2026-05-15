@@ -5,6 +5,7 @@ import { config } from "./config/env.js";
 import { errorHandler } from "./middleware/error.js";
 import { notFoundHandler } from "./middleware/notFound.js";
 import { disconnectPrisma } from "./db/connection.js";
+import { logger } from "./utils/logger.js";
 
 const app = express();
 const PORT = config.PORT;
@@ -14,9 +15,12 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
-    console.log(
-      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
-    );
+    logger.info({
+      method: req.method,
+      url: req.originalUrl,
+      status: res.statusCode,
+      duration: `${duration}ms`,
+    });
   });
   next();
 });
@@ -39,17 +43,15 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
-  console.log(
-    `Server running on http://localhost:${PORT} [${config.NODE_ENV}]`,
-  );
+  logger.info(`Server running on http://localhost:${PORT} [${config.NODE_ENV}]`);
 });
 
 // Graceful shutdown
 async function shutdown() {
-  console.log("Shutting down gracefully...");
+  logger.info("Shutting down gracefully...");
   server.close(async () => {
     await disconnectPrisma();
-    console.log("Server closed.");
+    logger.info("Server closed.");
     process.exit(0);
   });
 }
