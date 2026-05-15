@@ -13,7 +13,9 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
-    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+    console.log(
+      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
+    );
   });
   next();
 });
@@ -35,7 +37,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT} [${config.NODE_ENV}]`);
+  console.log(
+    `Server running on http://localhost:${PORT} [${config.NODE_ENV}]`,
+  );
 });
 
 // Graceful shutdown

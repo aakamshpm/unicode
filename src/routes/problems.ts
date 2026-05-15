@@ -1,9 +1,12 @@
 import { Router } from "express";
-import * as controller from "../controllers/problems.js";
+import { listProblems, getProblem } from "../controllers/problems.js";
+import { submitSolution } from "../controllers/submission.js";
 
 const router: Router = Router();
 
-router.get("/", controller.listProblems);
-router.get("/:id", controller.getProblem);
+router.get("/", listProblems);
+router.get("/:id", getProblem);
+
+router.post("/:id/submission", submitSolution);
 
 export default router;
