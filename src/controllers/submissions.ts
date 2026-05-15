@@ -1,11 +1,14 @@
 import type { Request, Response } from "express";
-import { createSubmission } from "../services/submission.js";
+import {
+  createSubmission,
+  fetchSubmissionStatus,
+} from "../services/submission.js";
 import { successResponse } from "../middleware/response.js";
 import { AppError } from "../middleware/error.js";
 
 const ALLOWED_LANGUAGES = ["javascript", "python"];
 
-export async function submitSolution(req: Request, res: Response) {
+async function submitSolution(req: Request, res: Response) {
   const problemId = Number(req.params.id);
   const { code, language } = req.body;
 
@@ -34,3 +37,17 @@ export async function submitSolution(req: Request, res: Response) {
     }),
   );
 }
+
+async function getSubmissionStatus(req: Request, res: Response) {
+  const submissionId = Number(req.params.id);
+
+  if (isNaN(submissionId) || submissionId <= 0) {
+    throw new AppError("Invalid submission ID", 400);
+  }
+
+  const result = await fetchSubmissionStatus(submissionId);
+
+  res.json(successResponse(result));
+}
+
+export { submitSolution, getSubmissionStatus };

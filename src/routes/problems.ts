@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { listProblems, getProblem } from "../controllers/problems.js";
-import { submitSolution } from "../controllers/submission.js";
+import { submitSolution } from "../controllers/submissions.js";
 
 const router: Router = Router();
 
