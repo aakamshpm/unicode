@@ -13,21 +13,57 @@ datasource db {
 }
 
 model Problem {
-  id          Int        @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   title       String
-  slug        String     @unique
+  slug        String       @unique
   difficulty  Difficulty
   description String
   examples    Json
   constraints String[]
   starterCode Json
-  testCases   Json
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  testCases   TestCase[]
+  submissions Submission[]
 }
 
 enum Difficulty {
   EASY
   MEDIUM
   HARD
+}
+
+model TestCase {
+  id             Int     @id @default(autoincrement())
+  problemId      Int
+  problem        Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  input          String // test_case_X.in content
+  expectedOutput String // test_case_X_expected_output.out content
+  order          Int // execution order
+  isHidden       Boolean @default(false) // hidden test cases for contests
+  @@unique([problemId, order])
+}
+
+model Submission {
+  id          Int              @id @default(autoincrement())
+  problemId   Int
+  problem     Problem          @relation(fields: [problemId], references: [id])
+  code        String // user's submitted code
+  language    String // e.g., "python", "javascript"
+  status      SubmissionStatus @default(PENDING)
+  results     Json? // [{ testCaseId, status, executionTime, memoryUsed, output? }]
+  totalTests  Int              @default(0)
+  passedTests Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum SubmissionStatus {
+  PENDING
+  RUNNING
+  ACCEPTED
+  WRONG_ANSWER
+  TIMEOUT
+  COMPILATION_ERROR
+  RUNTIME_ERROR
 }
