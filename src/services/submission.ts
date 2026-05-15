@@ -1,5 +1,6 @@
 import { prisma } from "../db/connection.js";
 import { AppError } from "../middleware/error.js";
+import { submissionQueue } from "../queue/config.js";
 
 async function createSubmission(
   problemId: number,
@@ -20,6 +21,15 @@ async function createSubmission(
       status: "PENDING", // status is set to PENDING as the code is Queued at first
     },
   });
+
+  // add the submission to Queue
+  await submissionQueue.add("execute-code", {
+    submissionId: submission.id,
+    problemId,
+    code,
+    language,
+  });
+
   return submission;
 }
 
