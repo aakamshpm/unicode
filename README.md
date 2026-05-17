@@ -61,6 +61,7 @@ cp .env.example .env
 
 # Migrate DB and seed problems
 npx prisma migrate dev
+npx prisma generate
 pnpm seed:problems
 
 # Terminal 1 — API server
