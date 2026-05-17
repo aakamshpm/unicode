@@ -13,18 +13,20 @@ datasource db {
 }
 
 model Problem {
-  id          Int          @id @default(autoincrement())
-  title       String
-  slug        String       @unique
-  difficulty  Difficulty
-  description String
-  examples    Json
-  constraints String[]
-  starterCode Json
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  testCases   TestCase[]
-  submissions Submission[]
+  id                 Int                 @id @default(autoincrement())
+  title              String
+  slug               String              @unique
+  difficulty         Difficulty
+  description        String
+  examples           Json
+  constraints        String[]
+  starterCode        Json
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  testCases          TestCase[]
+  submissions        Submission[]
+  contestProblems    ContestProblem[]
+  contestSubmissions ContestSubmission[]
 }
 
 enum Difficulty {
@@ -41,21 +43,23 @@ model TestCase {
   expectedOutput String // test_case_X_expected_output.out content
   order          Int // execution order
   isHidden       Boolean @default(false) // hidden test cases for contests
+
   @@unique([problemId, order])
 }
 
 model Submission {
-  id          Int              @id @default(autoincrement())
-  problemId   Int
-  problem     Problem          @relation(fields: [problemId], references: [id])
-  code        String // user's submitted code
-  language    String // e.g., "python", "javascript"
-  status      SubmissionStatus @default(PENDING)
-  results     Json? // [{ testCaseId, status, executionTime, memoryUsed, output? }]
-  totalTests  Int              @default(0)
-  passedTests Int              @default(0)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                Int                @id @default(autoincrement())
+  problemId         Int
+  problem           Problem            @relation(fields: [problemId], references: [id])
+  code              String // user's submitted code
+  language          String // e.g., "python", "javascript"
+  status            SubmissionStatus   @default(PENDING)
+  results           Json? // [{ testCaseId, status, executionTime, memoryUsed, output? }]
+  totalTests        Int                @default(0)
+  passedTests       Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  contestSubmission ContestSubmission?
 }
 
 enum SubmissionStatus {
@@ -66,4 +70,49 @@ enum SubmissionStatus {
   TIMEOUT
   COMPILATION_ERROR
   RUNTIME_ERROR
+}
+
+model Contest {
+  id          Int                 @id @default(autoincrement())
+  title       String
+  slug        String              @unique
+  description String
+  startTime   DateTime
+  endTime     DateTime
+  isActive    Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  problems    ContestProblem[]
+  submissions ContestSubmission[]
+}
+
+model ContestProblem {
+  id        Int     @id @default(autoincrement())
+  contestId Int
+  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  problemId Int
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  points    Int // points awarded for solving this problem
+  order     Int // display order in contest
+
+  @@unique([contestId, problemId])
+  @@unique([contestId, order])
+}
+
+model ContestSubmission {
+  id            Int              @id @default(autoincrement())
+  contestId     Int
+  contest       Contest          @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  userId        String // external user identifier
+  problemId     Int
+  problem       Problem          @relation(fields: [problemId], references: [id])
+  submissionId  Int              @unique // link to main Submission table
+  submission    Submission       @relation(fields: [submissionId], references: [id])
+  status        SubmissionStatus @default(PENDING)
+  wrongAttempts Int              @default(0)
+  solvedAt      DateTime? // first accepted submission time
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([contestId, userId, problemId])
 }

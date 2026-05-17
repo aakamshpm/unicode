@@ -205,6 +205,38 @@ async function seed() {
   }
 
   console.log("Seeded 3 problems with test cases");
+
+  // --- Contest Seeding ---
+   const now = new Date();
+   const contestStartTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+   const contestEndTime = new Date(contestStartTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
+   const contest = await prisma.contest.upsert({
+     where: { slug: "weekly-contest-1" },
+     update: {},
+     create: {
+       title: "Weekly Contest 1",
+       slug: "weekly-contest-1",
+       description: "Weekly coding contest featuring 3 problems. Solve as many as you can within 2 hours.",
+       startTime: contestStartTime,
+       endTime: contestEndTime,
+       isActive: true,
+     },
+   });
+   const contestProblems = [
+     { contestId: contest.id, problemId: twoSum.id, points: 500, order: 1 },
+     { contestId: contest.id, problemId: longestSubstring.id, points: 1000, order: 2 },
+     { contestId: contest.id, problemId: mergeIntervals.id, points: 1500, order: 3 },
+   ];
+   for (const cp of contestProblems) {
+     await prisma.contestProblem.upsert({
+       where: {
+         contestId_problemId: { contestId: cp.contestId, problemId: cp.problemId },
+       },
+       update: {},
+       create: cp,
+     });
+   }
+   console.log("Seeded 1 contest with 3 problems");
 }
 seed()
   .catch((err) => {
