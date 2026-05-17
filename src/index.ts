@@ -1,6 +1,7 @@
 import express from "express";
 import problemRoutes from "./routes/problems.js";
 import submissionsRouter from "./routes/submissions.js";
+import contestRoutes from "./routes/contests.js";
 import { config } from "./config/env.js";
 import { errorHandler } from "./middleware/error.js";
 import { notFoundHandler } from "./middleware/notFound.js";
@@ -35,6 +36,7 @@ app.get("/api/health", (_req, res) => {
 // Routes
 app.use("/api/problems", problemRoutes);
 app.use("/api/submissions", submissionsRouter);
+app.use("/api/contests", contestRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
@@ -43,7 +45,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT} [${config.NODE_ENV}]`);
+  logger.info(
+    `Server running on http://localhost:${PORT} [${config.NODE_ENV}]`,
+  );
 });
 
 // Graceful shutdown
