@@ -10,7 +10,7 @@ const ALLOWED_LANGUAGES = ["javascript", "python"];
 
 async function submitSolution(req: Request, res: Response) {
   const problemId = Number(req.params.id);
-  const { code, language } = req.body;
+  const { code, language, userId } = req.body;
 
   if (isNaN(problemId) || problemId <= 0) {
     throw new AppError("Invalid problem ID", 400);
@@ -27,7 +27,16 @@ async function submitSolution(req: Request, res: Response) {
     );
   }
 
-  const submission = await createSubmission(problemId, code, language);
+  if (!userId || typeof userId !== "string" || userId.trim().length === 0) {
+    throw new AppError("userId is required", 400);
+  }
+
+  const submission = await createSubmission(
+    problemId,
+    code,
+    language,
+    userId.trim(),
+  );
 
   // return with status code 202 because code execution is still in process and yet to complete
   res.status(202).json(

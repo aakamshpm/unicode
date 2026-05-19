@@ -6,6 +6,7 @@ async function createSubmission(
   problemId: number,
   code: string,
   language: string,
+  userId: string,
 ) {
   const problem = await prisma.problem.findUnique({ where: { id: problemId } });
 
@@ -22,12 +23,24 @@ async function createSubmission(
     },
   });
 
+  const now = new Date();
+  const activeContest = await prisma.contest.findFirst({
+    where: {
+      isActive: true, // contest must be active
+      startTime: { lte: now }, // contest start time must be less than or equal to createSubmission time
+      endTime: { gt: now }, // contest end time must be greater than createSubmission time
+      problems: { some: { problemId } }, // there should exist a problemId with passed one
+    },
+  });
+
   // add the submission to Queue
   await submissionQueue.add("execute-code", {
     submissionId: submission.id,
     problemId,
     code,
     language,
+    userId,
+    contestId: activeContest?.id ?? null,
   });
 
   return submission;
